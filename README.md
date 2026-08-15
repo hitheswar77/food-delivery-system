@@ -2,6 +2,8 @@
 
 <div align="center">
   <h3>A Full-Stack Food Delivery Application with Real-time Order Tracking and Redundant Data Storage</h3>
+  <br />
+  <strong>🌐 Live Demo: <a href="https://food-delivery-system-teal.vercel.app" target="_blank">https://food-delivery-system-teal.vercel.app</a></strong>
 </div>
 
 ---
