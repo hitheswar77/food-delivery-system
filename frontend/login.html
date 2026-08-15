@@ -8,18 +8,20 @@
 
 <h1>Login</h1>
 
-<input id="email" placeholder="Enter your email" />
+<input id="email" placeholder="Enter your email" type="email" />
+<input id="password" placeholder="Enter your password" type="password" />
 
 <button class="btn" onclick="login()">Login</button>
 
 <script>
 function login() {
     let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
 
     fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, password })
     })
     .then(res => res.json())
     .then(data => {

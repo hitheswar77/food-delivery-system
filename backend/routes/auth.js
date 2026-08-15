@@ -5,13 +5,17 @@ const router = express.Router();
 
 // SIGNUP
 router.post("/signup", (req, res) => {
-    const { name, email } = req.body;
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: "Name, email, and password are required" });
+    }
 
     db.query(
-        "INSERT INTO Users (name, email) VALUES (?, ?)",
-        [name, email],
+        "INSERT INTO Users (name, email, password) VALUES (?, ?, ?)",
+        [name, email, password],
         (err, result) => {
-            if (err) return res.status(400).json({ error: err });
+            if (err) return res.status(400).json({ error: err.sqlMessage || "Signup failed" });
 
             res.json({
                 message: "Signup successful",
@@ -25,16 +29,20 @@ router.post("/signup", (req, res) => {
 
 // LOGIN
 router.post("/login", (req, res) => {
-    const { email } = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+    }
 
     db.query(
-        "SELECT * FROM Users WHERE email = ?",
-        [email],
+        "SELECT * FROM Users WHERE email = ? AND password = ?",
+        [email, password],
         (err, results) => {
-            if (err) return res.status(500).json({ error: err });
+            if (err) return res.status(500).json({ error: "Database error" });
 
             if (results.length === 0)
-                return res.status(404).json({ message: "User not found" });
+                return res.status(401).json({ message: "Invalid email or password" });
 
             res.json({
                 message: "Login successful",
