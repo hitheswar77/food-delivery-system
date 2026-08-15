@@ -15,7 +15,7 @@ router.post("/signup", (req, res) => {
         "INSERT INTO Users (name, email, password) VALUES (?, ?, ?)",
         [name, email, password],
         (err, result) => {
-            if (err) return res.status(400).json({ error: err.sqlMessage || "Signup failed" });
+            if (err) return res.status(400).json({ error: err.message || err.sqlMessage || "Signup failed" });
 
             res.json({
                 message: "Signup successful",
@@ -39,7 +39,7 @@ router.post("/login", (req, res) => {
         "SELECT * FROM Users WHERE email = ? AND password = ?",
         [email, password],
         (err, results) => {
-            if (err) return res.status(500).json({ error: "Database error" });
+            if (err) return res.status(500).json({ error: err.message || "Database error" });
 
             if (results.length === 0)
                 return res.status(401).json({ message: "Invalid email or password" });
