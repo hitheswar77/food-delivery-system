@@ -10,13 +10,13 @@ router.get("/", (req, res) => {
     if (location) {
         // Filter by location
         db.query("SELECT * FROM Restaurants WHERE location = ?", [location], (err, results) => {
-            if (err) throw err;
+            if (err) return res.status(500).json({ error: err.message });
             res.json(results);
         });
     } else {
         // Get all restaurants
         db.query("SELECT * FROM Restaurants", (err, results) => {
-            if (err) throw err;
+            if (err) return res.status(500).json({ error: err.message });
             res.json(results);
         });
     }
@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
 // GET all unique locations
 router.get("/locations/all", (req, res) => {
     db.query("SELECT DISTINCT location FROM Restaurants WHERE location IS NOT NULL ORDER BY location", (err, results) => {
-        if (err) throw err;
+        if (err) return res.status(500).json({ error: err.message });
         res.json(results);
     });
 });

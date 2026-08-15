@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
@@ -17,10 +16,10 @@ const ordersRoute = require("./routes/orders");
 const reviewsRoute = require("./routes/reviews");
 const authRoute = require("./routes/auth");
 
-// Default test route
-app.get("/", (req, res) => {
-    res.send("Backend running...");
-});
+const path = require("path");
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Assigning route prefixes
 app.use("/api/restaurants", restaurantsRoute);

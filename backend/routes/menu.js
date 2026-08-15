@@ -10,7 +10,7 @@ router.get("/:id", (req, res) => {
         "SELECT * FROM Menu_Items WHERE restaurant_id = ?",
         [restaurant_id],
         (err, results) => {
-            if (err) throw err;
+            if (err) return res.status(500).json({ error: err.message });
             res.json(results);
         }
     );

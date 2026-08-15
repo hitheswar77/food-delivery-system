@@ -10,8 +10,12 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-    if (err) throw err;
-    console.log("MySQL Connected!");
+    if (err) {
+        console.error("MySQL Connection Error:", err.message);
+        // Do NOT throw error, otherwise Vercel crashes
+    } else {
+        console.log("MySQL Connected!");
+    }
 });
 
 module.exports = db;

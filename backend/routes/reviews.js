@@ -18,7 +18,7 @@ router.post("/add", async (req, res) => {
 
         // Get restaurant location from MySQL
         db.query("SELECT location FROM Restaurants WHERE restaurant_id = ?", [restaurant_id], async (err, results) => {
-            if (err) throw err;
+            if (err) return res.status(500).json({ error: err.message });
             
             const location = results.length > 0 ? results[0].location : null;
 
