@@ -1,0 +1,116 @@
+/* ---------- GLOBAL ---------- */
+body {
+    margin: 0;
+    font-family: Poppins, Arial, sans-serif;
+    background: linear-gradient(to bottom right, #f6f9ff, #e9eeff);
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* ---------- NAVBAR ---------- */
+.navbar {
+    background: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.navbar h2 {
+    margin: 0;
+    color: #444;
+}
+
+.navbar span {
+    font-weight: bold;
+    color: #0066ff;
+}
+
+/* ---------- CARD ---------- */
+.card {
+    background: white;
+    margin: 20px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 420px;
+    border-radius: 16px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0px 12px 25px rgba(0,0,0,0.18);
+}
+
+.card button, .btn {
+    background: #0066ff;
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 10px;
+    transition: 0.25s;
+}
+
+.card button:hover, .btn:hover {
+    background: #0049b8;
+    transform: scale(1.05);
+}
+
+/* ---------- INPUTS ---------- */
+input {
+    width: 80%;
+    padding: 12px;
+    display: block;
+    margin: 10px auto;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+input:focus {
+    border-color: #0066ff;
+}
+
+/* ---------- SUCCESS ANIMATION ---------- */
+.success {
+    text-align: center;
+    margin-top: 50px;
+    animation: pop 0.5s ease forwards;
+}
+
+@keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+/* ---------- SKELETON LOADER ---------- */
+.skeleton {
+    background: linear-gradient(90deg, #e2e2e2 25%, #f1f1f1 50%, #e2e2e2 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 12px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 420px;
+    height: 120px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}

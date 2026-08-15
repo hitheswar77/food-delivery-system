@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Menu Items</h2>
+    <div id="userBox"></div>
+</div>
+
+<div id="menuList">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+</div>
+
+<script>
+let user = localStorage.getItem("user");
+if (!user) window.location.href = "login.html";
+user = JSON.parse(user);
+
+document.getElementById("userBox").innerHTML =
+`Welcome, <span>${user.name}</span> | <a href="#" onclick="logout()">Logout</a>`;
+
+const params = new URLSearchParams(window.location.search);
+const restaurant_id = params.get("restaurant_id");
+
+fetch(`/api/menu/${restaurant_id}`)
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+        data.forEach(item => {
+            html += `
+                <div class="card">
+                    <h3>${item.item_name}</h3>
+                    <p>₹${item.price}</p>
+                    <button onclick="orderNow(${item.item_id}, ${restaurant_id}, ${item.price})">Order Now</button>
+                </div>
+            `;
+        });
+
+        setTimeout(() => {
+            document.getElementById("menuList").innerHTML = html;
+        }, 800);
+    });
+
+function orderNow(item_id, restaurant_id, price) {
+    window.location.href = `order.html?item_id=${item_id}&restaurant_id=${restaurant_id}&price=${price}`;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Food - Food Delivery</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .location-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .location-btn:hover {
+            border-color: #0066ff;
+            background: #f0f7ff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
+        }
+
+        .location-btn.active {
+            background: #0066ff;
+            color: white;
+            border-color: #0066ff;
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .restaurant-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .restaurant-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+        }
+
+        .restaurant-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .restaurant-location {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .restaurant-actions {
+            padding: 15px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .restaurant-actions button {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-menu {
+            background: #0066ff;
+            color: white;
+        }
+
+        .btn-menu:hover {
+            background: #0052cc;
+        }
+
+        .btn-review {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .btn-review:hover {
+            background: #ffc107;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-btn {
+            background: #f5f5f5;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>🍕 Food Delivery</h2>
+    <div id="userBox"></div>
+</div>
+
+<!-- LOCATION SELECTION SCREEN -->
+<div id="locationScreen">
+    <h1>Select Your Location</h1>
+    <p style="text-align:center; color:#666; font-size:14px;">Choose where you want to order from</p>
+    <div class="location-grid" id="locationGrid"></div>
+</div>
+
+<!-- RESTAURANT LIST SCREEN -->
+<div id="restaurantScreen" class="hidden">
+    <button class="back-btn" onclick="backToLocations()">← Back to Locations</button>
+    <h1 id="screenTitle">Restaurants</h1>
+    <div class="restaurant-grid" id="restaurantList"></div>
+</div>
+
+<script>
+// USER CHECK
+let user = localStorage.getItem("user");
+if (!user) window.location.href = "login.html";
+user = JSON.parse(user);
+
+document.getElementById("userBox").innerHTML =
+`Welcome, <span>${user.name}</span> | <a href="#" onclick="logout()">Logout</a>`;
+
+function logout() {
+    localStorage.removeItem("user");
+    location.reload();
+}
+
+let selectedLocation = null;
+
+// Load locations
+async function loadLocations() {
+    try {
+        const res = await fetch('/api/restaurants/locations/all');
+        const data = await res.json();
+        const grid = document.getElementById('locationGrid');
+        grid.innerHTML = '';
+
+        data.forEach(loc => {
+            const btn = document.createElement('button');
+            btn.className = 'location-btn';
+            // loc is an object with 'location' property
+            const locationName = loc.location || loc;
+            btn.textContent = '📍 ' + locationName;
+            btn.onclick = (event) => selectLocation(locationName, event);
+            grid.appendChild(btn);
+        });
+    } catch (err) {
+        console.error('Error loading locations:', err);
+        document.getElementById('locationGrid').innerHTML = '<p style="color:#f00">Failed to load locations</p>';
+    }
+}
+
+// Select location and show restaurants
+function selectLocation(location, event) {
+    selectedLocation = location;
+    document.querySelectorAll('.location-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Switch to restaurant screen
+    document.getElementById('locationScreen').classList.add('hidden');
+    document.getElementById('restaurantScreen').classList.remove('hidden');
+    document.getElementById('screenTitle').textContent = `Restaurants in ${location}`;
+
+    loadRestaurants(location);
+}
+
+// Back to location selection
+function backToLocations() {
+    selectedLocation = null;
+    document.getElementById('locationScreen').classList.remove('hidden');
+    document.getElementById('restaurantScreen').classList.add('hidden');
+    document.querySelectorAll('.location-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+// Load restaurants for selected location
+async function loadRestaurants(location) {
+    try {
+        const url = `/api/restaurants?location=${encodeURIComponent(location)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const grid = document.getElementById('restaurantList');
+        grid.innerHTML = '';
+
+        if (data.length === 0) {
+            grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;">No restaurants found</p>';
+            return;
+        }
+
+        data.forEach(r => {
+            const card = document.createElement('div');
+            card.className = 'restaurant-card';
+            card.innerHTML = `
+                <div class="restaurant-header">
+                    <h3>${r.name}</h3>
+                    <div class="restaurant-location">📍 ${r.location}</div>
+                </div>
+                <div class="restaurant-actions">
+                    <button class="btn-menu" onclick="window.location.href='menu.html?restaurant_id=${r.restaurant_id}'">
+                        View Menu
+                    </button>
+                    <button class="btn-review" onclick="window.location.href='reviews.html?restaurant_id=${r.restaurant_id}'">
+                        ⭐ Review
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        console.error('Error loading restaurants:', err);
+        document.getElementById('restaurantList').innerHTML = '<p style="color:#f00">Failed to load restaurants</p>';
+    }
+}
+
+// Initialize
+loadLocations();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Place Order</h2>
+    <div id="userBox"></div>
+</div>
+
+<div id="orderBox" class="card"></div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("user"));
+
+let params = new URLSearchParams(window.location.search);
+let item_id = params.get("item_id");
+let restaurant_id = params.get("restaurant_id");
+let price = params.get("price");
+
+document.getElementById("orderBox").innerHTML = `
+    <h3>Confirm Order</h3>
+    <p>Item ID: ${item_id}</p>
+    <p>Price: ₹${price}</p>
+    <button onclick="placeOrder()">Place Order</button>
+`;
+
+function placeOrder() {
+    fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            user_id: parseInt(user.user_id),
+            restaurant_id: parseInt(restaurant_id),
+            item_id: parseInt(item_id),
+            total_amount: parseFloat(price)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.body.innerHTML = `
+            <h1 class='success'>🎉 Order Placed Successfully!</h1>
+            <p style='text-align:center; font-size:20px;'>Order ID: <b>${data.order_id}</b></p>
+
+            <div style='text-align:center; margin-top:20px;'>
+                <button class="btn" onclick="window.location.href='index.html'">Go Home</button>
+            </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>

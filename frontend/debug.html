@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #0066ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0049b8;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 150px;
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔍 API Debug & Test Page</h1>
+
+<div class="card">
+    <h2>Backend Status</h2>
+    <button onclick="testBackend()">Test Backend Connection</button>
+    <p id="backendStatus"></p>
+</div>
+
+<div class="card">
+    <h2>Test Review Submission</h2>
+    <input type="number" id="userId" placeholder="User ID" value="1">
+    <input type="number" id="restaurantId" placeholder="Restaurant ID" value="1">
+    <input type="number" id="rating" placeholder="Rating (1-5)" value="5">
+    <textarea id="reviewText" placeholder="Review text...">This is a great restaurant!</textarea>
+    <button onclick="testReview()">Submit Test Review</button>
+    <p id="reviewStatus"></p>
+</div>
+
+<div class="card">
+    <h2>Test Order Submission</h2>
+    <input type="number" id="orderUserId" placeholder="User ID" value="1">
+    <input type="number" id="orderRestaurantId" placeholder="Restaurant ID" value="1">
+    <input type="number" id="itemId" placeholder="Item ID" value="1">
+    <input type="number" id="amount" placeholder="Total Amount" value="300">
+    <button onclick="testOrder()">Submit Test Order</button>
+    <p id="orderStatus"></p>
+</div>
+
+<div class="card">
+    <h2>Database Check</h2>
+    <button onclick="checkReviews()">Check All Reviews (MySQL)</button>
+    <button onclick="checkOrders()">Check All Orders (MySQL)</button>
+    <textarea id="dbOutput" readonly></textarea>
+</div>
+
+<script>
+const baseURL = "/api";
+
+function setStatus(elementId, message, isError = false) {
+    const el = document.getElementById(elementId);
+    el.innerText = message;
+    el.className = isError ? "error" : "success";
+}
+
+function testBackend() {
+    fetch(baseURL)
+        .then(res => res.text())
+        .then(data => setStatus("backendStatus", "✓ Backend is running: " + data))
+        .catch(err => setStatus("backendStatus", "✗ Backend error: " + err.message, true));
+}
+
+function testReview() {
+    const data = {
+        user_id: parseInt(document.getElementById("userId").value),
+        restaurant_id: parseInt(document.getElementById("restaurantId").value),
+        rating: parseInt(document.getElementById("rating").value),
+        review_text: document.getElementById("reviewText").value
+    };
+
+    console.log("Sending review:", data);
+
+    fetch(baseURL + "/reviews/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Response:", data);
+        setStatus("reviewStatus", "✓ Review submitted! ID: " + data.review_id);
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        setStatus("reviewStatus", "✗ Error: " + err.message, true);
+    });
+}
+
+function testOrder() {
+    const data = {
+        user_id: parseInt(document.getElementById("orderUserId").value),
+        restaurant_id: parseInt(document.getElementById("orderRestaurantId").value),
+        item_id: parseInt(document.getElementById("itemId").value),
+        total_amount: parseFloat(document.getElementById("amount").value)
+    };
+
+    console.log("Sending order:", data);
+
+    fetch(baseURL + "/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Response:", data);
+        setStatus("orderStatus", "✓ Order placed! ID: " + data.order_id);
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        setStatus("orderStatus", "✗ Error: " + err.message, true);
+    });
+}
+
+function checkReviews() {
+    fetch(baseURL + "/reviews/all")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("dbOutput").value = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+            document.getElementById("dbOutput").value = "Error: " + err.message;
+        });
+}
+
+function checkOrders() {
+    fetch(baseURL + "/order")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("dbOutput").value = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+            // orders endpoint might not have a GET, try checking via backend
+            document.getElementById("dbOutput").value = "GET /order not available. Check browser console for details.";
+        });
+}
+
+// Auto test on load
+window.onload = testBackend;
+</script>
+
+</body>
+</html>

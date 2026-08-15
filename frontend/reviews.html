@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reviews - Food Delivery</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .review-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-btn {
+            background: #f5f5f5;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #ddd;
+        }
+
+        .review-form {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066ff;
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 12px;
+            font-size: 40px;
+            margin: 15px 0;
+        }
+
+        .star {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ddd;
+        }
+
+        .star:hover {
+            color: #ffc107;
+            transform: scale(1.2);
+        }
+
+        .star.active {
+            color: #ffc107;
+        }
+
+        .rating-display {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .reviews-section {
+            margin-top: 40px;
+        }
+
+        .reviews-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .review-item {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #ffc107;
+            transition: all 0.3s ease;
+        }
+
+        .review-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .review-stars {
+            font-size: 20px;
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .review-user {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .review-text {
+            color: #555;
+            line-height: 1.6;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .no-reviews {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 15px;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 320ms ease;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .review-item { animation: fadeInUp 360ms ease both; }
+
+        .success-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .submit-spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.25);
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .star.pulse {
+            animation: pulse 360ms ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+
+        .char-count {
+            font-size: 12px; color: #999; text-align: right; margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>⭐ Write a Review</h2>
+    <div id="userBox"></div>
+</div>
+
+<button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+
+<div class="review-container">
+    <div class="success-message" id="successMsg">✓ Review submitted successfully!</div>
+    <div class="error-message" id="errorMsg"></div>
+
+    <!-- REVIEW FORM -->
+    <div class="review-form">
+        <h2 style="margin-top:0;color:#333;">Share Your Experience</h2>
+
+        <div class="form-group">
+            <label>Select Restaurant</label>
+            <select id="restaurant_id" onchange="loadDishes()">
+                <option value="">-- Choose a Restaurant --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Select Dish (Optional)</label>
+            <select id="dish_id">
+                <option value="">-- All Dishes --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>How would you rate the food?</label>
+            <div class="star-rating" id="starRating">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+            <input type="hidden" id="rating" value="0">
+            <div class="rating-display" id="ratingDisplay">No rating selected</div>
+        </div>
+
+        <div class="form-group">
+            <label>Your Comments</label>
+            <textarea id="review_text" placeholder="Tell us about your experience..."></textarea>
+            <div class="char-count" id="charCount">0 / 500</div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="addReview()">
+            <span class="btn-text">Submit Review</span>
+            <span id="btnSpinner" class="submit-spinner" style="display:none"></span>
+        </button>
+    </div>
+
+    <!-- REVIEWS LIST -->
+    <div class="reviews-section">
+        <div class="reviews-title">Customer Reviews</div>
+        <div id="reviewList">
+            <div class="no-reviews">Loading reviews...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// USER CHECK
+let user = localStorage.getItem("user");
+if (!user) window.location.href = "login.html";
+user = JSON.parse(user);
+
+document.getElementById("userBox").innerHTML =
+`Welcome, <span>${user.name}</span> | <a href="#" onclick="logout()">Logout</a>`;
+
+function logout() {
+    localStorage.removeItem("user");
+    location.reload();
+}
+
+// STAR RATING
+let selectedRating = 0;
+
+function initStars() {
+    document.querySelectorAll('#starRating .star').forEach(star => {
+        star.addEventListener('click', () => {
+            selectedRating = parseInt(star.dataset.value);
+            document.getElementById('rating').value = selectedRating;
+            updateStarDisplay(selectedRating);
+            // pulse animation on click
+            star.classList.add('pulse');
+            setTimeout(() => star.classList.remove('pulse'), 360);
+        });
+        star.addEventListener('mouseover', () => updateStarDisplay(parseInt(star.dataset.value)));
+    });
+    document.getElementById('starRating').addEventListener('mouseleave', () => updateStarDisplay(selectedRating));
+}
+
+function updateStarDisplay(rating) {
+    document.querySelectorAll('#starRating .star').forEach(el => {
+        el.textContent = (parseInt(el.dataset.value) <= rating) ? '★' : '☆';
+    });
+    const labels = ['No rating', '😞 Poor', '😐 Average', '🙂 Good', '😊 Very Good', '😍 Excellent'];
+    document.getElementById('ratingDisplay').textContent = labels[rating] || 'No rating selected';
+}
+
+// LOAD RESTAURANTS
+async function loadRestaurants() {
+    try {
+        const res = await fetch('/api/restaurants');
+        const restaurants = await res.json();
+        const sel = document.getElementById('restaurant_id');
+        sel.innerHTML = '<option value="">-- Choose a Restaurant --</option>';
+        restaurants.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.restaurant_id;
+            opt.textContent = `${r.name} - ${r.location}`;
+            sel.appendChild(opt);
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        const rid = params.get('restaurant_id');
+        if (rid) { 
+            sel.value = rid;
+            loadDishes();
+        }
+    } catch (err) {
+        console.error('Failed to load restaurants', err);
+    }
+}
+
+// LOAD DISHES for selected restaurant
+async function loadDishes() {
+    const restaurant_id = document.getElementById('restaurant_id').value;
+    const dishSel = document.getElementById('dish_id');
+    
+    if (!restaurant_id) {
+        dishSel.innerHTML = '<option value="">-- All Dishes --</option>';
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/menu/${restaurant_id}`);
+        const dishes = await res.json();
+        dishSel.innerHTML = '<option value="">-- All Dishes --</option>';
+        
+        if (dishes && dishes.length > 0) {
+            dishes.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.item_id;
+                opt.textContent = `${d.item_name || d.name} (₹${d.price})`;
+                dishSel.appendChild(opt);
+            });
+        }
+    } catch (err) {
+        console.error('Failed to load dishes', err);
+        dishSel.innerHTML = '<option value="">-- All Dishes --</option>';
+    }
+}
+
+// RENDER REVIEWS (reusable)
+function renderReviews(reviews) {
+    const params = new URLSearchParams(window.location.search);
+    const filterRid = params.get('restaurant_id');
+    const filtered = filterRid ? reviews.filter(d => String(d.restaurant_id) === String(filterRid)) : reviews;
+
+    if (!filtered || filtered.length === 0) {
+        document.getElementById('reviewList').innerHTML = '<div class="no-reviews">No reviews yet. Be the first to review!</div>';
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    filtered.forEach(rev => {
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+        item.innerHTML = `
+            <div class="review-header">
+                <div class="review-stars">${stars} ${rev.rating}/5</div>
+                <div class="review-user">User #${rev.user_id}</div>
+            </div>
+            <div class="review-text">"${rev.review_text}"</div>
+        `;
+        fragment.appendChild(item);
+    });
+
+    const container = document.getElementById('reviewList');
+    container.innerHTML = '';
+    container.appendChild(fragment);
+}
+
+// ADD REVIEW (with loading, optimistic UI)
+async function addReview() {
+    const restaurant_id = document.getElementById('restaurant_id').value;
+    const dish_id = document.getElementById('dish_id').value;
+    const rating = parseInt(document.getElementById('rating').value || '0');
+    const review_text = document.getElementById('review_text').value || '';
+
+    if (!restaurant_id) { showError('Please select a restaurant'); return; }
+    if (!rating || rating < 1 || rating > 5) { showError('Please select a rating'); return; }
+    if (!review_text.trim()) { showError('Please write a comment'); return; }
+
+    const payload = {
+        user_id: user.user_id,
+        restaurant_id: parseInt(restaurant_id),
+        rating,
+        review_text
+    };
+
+    // Only include dish_id if one is selected
+    if (dish_id) {
+        payload.dish_id = parseInt(dish_id);
+    }
+
+    // Optimistic UI: prepend review locally
+    const optimistic = {
+        id: 'temp-' + Date.now(),
+        user_id: user.user_id,
+        restaurant_id: payload.restaurant_id,
+        dish_id: payload.dish_id || null,
+        rating: payload.rating,
+        review_text: payload.review_text,
+        created_at: new Date().toISOString()
+    };
+    prependReview(optimistic);
+    toggleSubmitLoading(true);
+
+    try {
+        const res = await fetch('/api/reviews/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.error) { throw new Error(data.error); }
+
+        // success: clear form and fetch fresh list in background
+        showSuccess();
+        document.getElementById('review_text').value = '';
+        document.getElementById('charCount').textContent = '0 / 500';
+        document.getElementById('dish_id').value = '';
+        selectedRating = 0;
+        document.getElementById('rating').value = '0';
+        updateStarDisplay(0);
+
+        // refresh reviews (ensures DB-sourced data)
+        loadReviews();
+    } catch (err) {
+        console.error('Submit error', err);
+        showError(err.message || 'Failed to submit review');
+        // remove optimistic item by reloading
+        loadReviews();
+    } finally {
+        toggleSubmitLoading(false);
+    }
+}
+
+function prependReview(rev) {
+    const container = document.getElementById('reviewList');
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+    item.innerHTML = `
+        <div class="review-header">
+            <div class="review-stars">${stars} ${rev.rating}/5</div>
+            <div class="review-user">User #${rev.user_id}</div>
+        </div>
+        <div class="review-text">"${rev.review_text}"</div>
+    `;
+    container.insertBefore(item, container.firstChild);
+}
+
+function toggleSubmitLoading(loading) {
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('btnSpinner');
+    const btnText = btn.querySelector('.btn-text');
+    if (loading) {
+        btn.disabled = true; btn.style.opacity = 0.8;
+        spinner.style.display = 'inline-block';
+        btnText.textContent = 'Submitting';
+    } else {
+        btn.disabled = false; btn.style.opacity = 1;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Submit Review';
+    }
+}
+
+// LOAD REVIEWS
+async function loadReviews() {
+    try {
+        const res = await fetch('/api/reviews/all');
+        const data = await res.json();
+        renderReviews(data);
+    } catch (err) {
+        console.error('Failed loading reviews', err);
+        document.getElementById('reviewList').innerHTML = '<p style="color:#f00;text-align:center">Error loading reviews</p>';
+    }
+}
+
+function showSuccess() {
+    const msg = document.getElementById('successMsg');
+    msg.classList.add('show');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.classList.remove('show'); setTimeout(()=> msg.style.display='none', 350); }, 3000);
+}
+
+function showError(message) {
+    const msg = document.getElementById('errorMsg');
+    msg.textContent = '⚠ ' + message;
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 4000);
+}
+
+function setupTextarea() {
+    const ta = document.getElementById('review_text');
+    const count = document.getElementById('charCount');
+    const max = 500;
+    const resize = () => {
+        ta.style.height = 'auto';
+        ta.style.height = (ta.scrollHeight) + 'px';
+        count.textContent = `${Math.min(ta.value.length, max)} / ${max}`;
+    };
+    ta.addEventListener('input', () => {
+        if (ta.value.length > max) ta.value = ta.value.slice(0, max);
+        resize();
+    });
+    // initial resize
+    resize();
+}
+
+// Initialize
+initStars();
+setupTextarea();
+loadRestaurants().then(loadReviews);
+</script>
+
+</body>
+</html>
