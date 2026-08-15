@@ -16,12 +16,13 @@ try {
   console.warn("⚠️ Firebase credentials not found or invalid.");
 }
 
+let firestore = null;
 if (serviceAccount) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
   console.log("Firestore Connected!");
+  firestore = admin.firestore();
 }
 
-const firestore = admin.firestore();
 module.exports = firestore;
