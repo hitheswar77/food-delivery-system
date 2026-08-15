@@ -27,9 +27,16 @@ function signup() {
     })
     .then(res => res.json())
     .then(data => {
-        localStorage.setItem("user", JSON.stringify(data));
-        alert("Signup successful!");
-        window.location.href = "index.html";
+        if (data.error) {
+            alert("Error: " + data.error);
+            return;
+        }
+        alert("Signup successful! Please log in with your new account.");
+        window.location.href = "login.html";
+    })
+    .catch(err => {
+        console.error(err);
+        alert("An error occurred during signup.");
     });
 }
 </script>

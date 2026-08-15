@@ -17,12 +17,10 @@
 </div>
 
 <script>
-let user = localStorage.getItem("user");
-if (!user) window.location.href = "login.html";
-user = JSON.parse(user);
-
-document.getElementById("userBox").innerHTML =
-`Welcome, <span>${user.name}</span> | <a href="#" onclick="logout()">Logout</a>`;
+let userStr = localStorage.getItem("user");
+        if (!userStr) window.location.href = "login.html";
+        const user = JSON.parse(userStr);
+        document.getElementById("userBox").innerHTML = `Welcome, <span>${user.name || 'User'}</span> | <a href="#" onclick="logout()">Logout</a>`;
 
 const params = new URLSearchParams(window.location.search);
 const restaurant_id = params.get("restaurant_id");

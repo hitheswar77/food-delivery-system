@@ -310,13 +310,11 @@
 </div>
 
 <script>
-// USER CHECK
-let user = localStorage.getItem("user");
-if (!user) window.location.href = "login.html";
-user = JSON.parse(user);
+        let userStr = localStorage.getItem("user");
+        if (!userStr) window.location.href = "login.html";
+        let user = JSON.parse(userStr);
 
-document.getElementById("userBox").innerHTML =
-`Welcome, <span>${user.name}</span> | <a href="#" onclick="logout()">Logout</a>`;
+        document.getElementById("userBox").innerHTML = `Welcome, <span>${user.name || 'User'}</span> | <a href="#" onclick="logout()">Logout</a>`;
 
 function logout() {
     localStorage.removeItem("user");
